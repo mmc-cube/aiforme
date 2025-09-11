@@ -4,7 +4,6 @@ import { useAuth } from '@/components/AuthProvider';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { getPostData } from '@/lib/posts';
 
 interface PostData {
   id: string;
@@ -135,17 +134,20 @@ function BlogContent() {
 
     async function loadPost() {
       try {
-        const postId = decodeURIComponent(params.id as string);
-        const postData = await getPostData(postId);
+        const postId = params.id as string;
+        const response = await fetch(`/api/posts/${postId}`);
         
-        if (postData) {
+        if (response.ok) {
+          const postData = await response.json();
           setPost(postData);
-        } else {
+        } else if (response.status === 404) {
           setError('文章不存在');
+        } else {
+          setError('加载文章失败');
         }
       } catch (error) {
         console.error('Failed to load post:', error);
-        setError('加载文章失败');
+        setError('网络错误，请稍后重试');
       } finally {
         setLoading(false);
       }
