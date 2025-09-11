@@ -22,10 +22,23 @@ module.exports = {
               color: '#111827',
             },
             code: {
-              backgroundColor: '#f3f4f6',
+              backgroundColor: '#1f2937',
+              color: '#f9fafb',
               padding: '0.125rem 0.25rem',
               borderRadius: '0.25rem',
               fontWeight: '400',
+            },
+            'pre code': {
+              backgroundColor: 'transparent',
+              color: '#f9fafb',
+              padding: 0,
+            },
+            pre: {
+              backgroundColor: '#1f2937',
+              color: '#f9fafb',
+              padding: '1rem',
+              borderRadius: '0.5rem',
+              overflowX: 'auto',
             },
             'code::before': {
               content: '""',
