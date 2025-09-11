@@ -13,8 +13,14 @@ const nextConfig = {
     CUSTOM_BUILD_TIME: new Date().toISOString()
   },
   
-  // 修复CSS处理问题
+  // Webpack配置：处理WASM文件和CSS问题
   webpack: (config, { isServer }) => {
+    // 处理WASM文件
+    config.module.rules.push({
+      test: /\.wasm$/,
+      type: 'webassembly/async',
+    });
+
     // 确保CSS文件不被Sucrase处理
     config.module.rules.forEach((rule) => {
       if (rule.oneOf) {
@@ -32,13 +38,23 @@ const nextConfig = {
         });
       }
     });
+
+    // 处理OG图片生成器
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+      };
+    }
     
     return config;
   },
   
-  // Netlify特定配置
+  // 配置支持实验性功能
   experimental: {
     outputFileTracingRoot: undefined,
+    serverComponentsExternalPackages: [],
   }
 }
 
