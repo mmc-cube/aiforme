@@ -6,10 +6,10 @@ import { AuthProvider } from '@/components/AuthProvider'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Knowledge Blog - Personal Knowledge Sharing',
-  description: 'A personal knowledge sharing website with invite-only access',
-  keywords: ['blog', 'knowledge', 'sharing', 'personal'],
-  authors: [{ name: 'Blog Owner' }],
+  title: '知识分享博客 - 个人知识分享平台',
+  description: '一个基于邀请码访问的个人知识分享网站',
+  keywords: ['博客', '知识', '分享', '个人'],
+  authors: [{ name: '博主' }],
   viewport: 'width=device-width, initial-scale=1',
 }
 

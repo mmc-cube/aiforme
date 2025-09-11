@@ -24,9 +24,9 @@ function BlogHeader() {
         <div className="flex justify-between items-center py-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              Knowledge Blog
+              知识分享博客
             </h1>
-            <p className="text-gray-600">Personal Knowledge Sharing Space</p>
+            <p className="text-gray-600">个人知识分享空间</p>
           </div>
           <button
             onClick={logout}
@@ -121,7 +121,7 @@ function BlogContent() {
         <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
-            <p className="mt-2 text-gray-600">Loading posts...</p>
+            <p className="mt-2 text-gray-600">正在加载文章...</p>
           </div>
         </main>
       </div>
@@ -140,16 +140,16 @@ function BlogContent() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No posts yet</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">暂无文章</h3>
             <p className="text-gray-600">
-              Add some Markdown files to the <code className="bg-gray-100 px-1 py-0.5 rounded">posts/</code> directory to get started.
+              在 <code className="bg-gray-100 px-1 py-0.5 rounded">posts/</code> 目录中添加一些 Markdown 文件即可开始。
             </p>
           </div>
         ) : (
           <div className="space-y-6">
             <div className="text-center mb-8">
               <h2 className="text-lg font-medium text-gray-900">
-                Latest Posts ({posts.length})
+                最新文章 ({posts.length})
               </h2>
             </div>
             
@@ -171,7 +171,7 @@ export default function HomePage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Loading...</p>
+          <p className="mt-2 text-gray-600">正在加载...</p>
         </div>
       </div>
     );

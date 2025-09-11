@@ -13,7 +13,7 @@ export default function LoginForm() {
     e.preventDefault();
     
     if (!code.trim()) {
-      setError('Please enter an invite code');
+      setError('请输入邀请码');
       return;
     }
 
@@ -24,11 +24,11 @@ export default function LoginForm() {
       const result = await login(code.trim());
       
       if (!result.success) {
-        setError(result.error || 'Invalid invite code');
+        setError(result.error || '邀请码无效');
       }
       // 成功的话，AuthProvider 会自动更新状态
     } catch (error) {
-      setError('Network error. Please try again.');
+      setError('网络错误，请重试。');
     } finally {
       setIsLoading(false);
     }
@@ -56,10 +56,10 @@ export default function LoginForm() {
               </svg>
             </div>
             <h1 className="text-2xl font-bold text-gray-900">
-              Welcome to Knowledge Blog
+              欢迎来到知识分享博客
             </h1>
             <p className="text-gray-600 mt-2">
-              Enter your invite code to access the content
+              请输入邀请码以访问内容
             </p>
           </div>
 
@@ -70,14 +70,14 @@ export default function LoginForm() {
                 htmlFor="invite-code"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                Invite Code
+                邀请码
               </label>
               <input
                 id="invite-code"
                 type="text"
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                placeholder="Enter your invite code"
+                placeholder="请输入您的邀请码"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                 disabled={isLoading}
                 autoComplete="off"
@@ -133,10 +133,10 @@ export default function LoginForm() {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  Verifying...
+                  验证中...
                 </div>
               ) : (
-                'Access Blog'
+                '访问博客'
               )}
             </button>
           </form>
@@ -144,7 +144,7 @@ export default function LoginForm() {
           {/* Footer */}
           <div className="mt-6 text-center">
             <p className="text-xs text-gray-500">
-              Don't have an invite code? Please contact the blog owner.
+              没有邀请码？请联系博主。
             </p>
           </div>
         </div>

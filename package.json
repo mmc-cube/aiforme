@@ -1,7 +1,7 @@
 {
   "name": "knowledge-blog-optimized",
   "version": "1.0.0",
-  "description": "个人知识分享网站 - 优化版 (邀请码访问制)",
+  "description": "个人知识分享博客 - 基于邀请码访问的中文知识分享平台",
   "private": true,
   "scripts": {
     "dev": "next dev",

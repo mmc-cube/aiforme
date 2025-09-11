@@ -8,7 +8,7 @@ export async function GET() {
   } catch (error) {
     console.error('Error fetching posts:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch posts' },
+      { error: '获取文章失败' },
       { status: 500 }
     );
   }

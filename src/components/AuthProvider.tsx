@@ -45,13 +45,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
       } else {
         return { 
           success: false, 
-          error: result.error || 'Verification failed' 
+          error: result.error || '验证失败' 
         };
       }
     } catch (error) {
       return { 
         success: false, 
-        error: 'Network error. Please try again.' 
+        error: '网络错误，请重试。' 
       };
     }
   };
@@ -84,7 +84,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error('useAuth 必须在 AuthProvider 内部使用');
   }
   return context;
 }
