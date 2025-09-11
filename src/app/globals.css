@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 自定义样式 */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+}
+
+@layer components {
+  /* 文章内容样式 */
+  .prose-custom {
+    @apply prose prose-gray max-w-none;
+  }
+  
+  .prose-custom h1 {
+    @apply text-3xl font-bold text-gray-900 mb-6;
+  }
+  
+  .prose-custom h2 {
+    @apply text-2xl font-semibold text-gray-800 mt-8 mb-4;
+  }
+  
+  .prose-custom h3 {
+    @apply text-xl font-medium text-gray-800 mt-6 mb-3;
+  }
+  
+  .prose-custom p {
+    @apply text-gray-700 leading-relaxed mb-4;
+  }
+  
+  .prose-custom code {
+    @apply bg-gray-100 px-1 py-0.5 rounded text-sm font-mono;
+  }
+  
+  .prose-custom pre {
+    @apply bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto;
+  }
+  
+  .prose-custom pre code {
+    @apply bg-transparent p-0;
+  }
+  
+  .prose-custom blockquote {
+    @apply border-l-4 border-indigo-500 pl-4 italic text-gray-600;
+  }
+  
+  .prose-custom ul {
+    @apply list-disc list-inside mb-4;
+  }
+  
+  .prose-custom ol {
+    @apply list-decimal list-inside mb-4;
+  }
+  
+  .prose-custom li {
+    @apply mb-1;
+  }
+  
+  .prose-custom table {
+    @apply w-full border-collapse border border-gray-300;
+  }
+  
+  .prose-custom th {
+    @apply border border-gray-300 bg-gray-100 px-4 py-2 text-left font-semibold;
+  }
+  
+  .prose-custom td {
+    @apply border border-gray-300 px-4 py-2;
+  }
+  
+  .prose-custom a {
+    @apply text-indigo-600 hover:text-indigo-800 underline;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
