@@ -46,7 +46,7 @@ function PostCard({ post }: { post: PostMeta }) {
       <div className="mb-4">
         <h2 className="text-xl font-semibold text-gray-900 mb-2">
           <Link 
-            href={`/posts/${post.id}`}
+            href={`/posts/${encodeURIComponent(post.id)}`}
             className="hover:text-indigo-600 transition-colors"
           >
             {post.title}

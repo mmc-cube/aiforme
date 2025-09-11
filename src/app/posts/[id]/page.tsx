@@ -135,7 +135,7 @@ function BlogContent() {
 
     async function loadPost() {
       try {
-        const postId = params.id as string;
+        const postId = decodeURIComponent(params.id as string);
         const postData = await getPostData(postId);
         
         if (postData) {
