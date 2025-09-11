@@ -1,6 +1,6 @@
 import { jwtVerify, SignJWT } from 'jose';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET || 'temporary-secret-key-for-testing';
 const TOKEN_KEY = 'knowledge-blog-token';
 
 export class AuthService {
@@ -73,20 +73,30 @@ export class AuthService {
   }
   
   /**
-   * 保存认证token到localStorage
+   * 保存认证token到localStorage和sessionStorage
    */
   static saveToken(token: string): void {
     if (typeof window !== 'undefined') {
       localStorage.setItem(TOKEN_KEY, token);
+      sessionStorage.setItem(TOKEN_KEY, token);
+      console.log('Auth: Token saved to storage');
     }
   }
   
   /**
-   * 从localStorage获取token
+   * 从localStorage获取token，如果没有则尝试sessionStorage
    */
   static getToken(): string | null {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem(TOKEN_KEY);
+      let token = localStorage.getItem(TOKEN_KEY);
+      if (!token) {
+        token = sessionStorage.getItem(TOKEN_KEY);
+        if (token) {
+          // 如果sessionStorage有token，恢复到localStorage
+          localStorage.setItem(TOKEN_KEY, token);
+        }
+      }
+      return token;
     }
     return null;
   }
@@ -98,6 +108,7 @@ export class AuthService {
     const token = this.getToken();
     
     if (!token) {
+      console.log('Auth: No token found');
       return false;
     }
     
@@ -106,8 +117,11 @@ export class AuthService {
       const { payload } = await jwtVerify(token, secret);
       
       // 检查token是否包含必要信息
-      return payload.verified === true;
+      const isValid = payload.verified === true;
+      console.log('Auth: Token validation result:', isValid);
+      return isValid;
     } catch (error) {
+      console.log('Auth: Token validation failed:', error);
       // Token无效或过期，清除本地存储
       this.clearToken();
       return false;
@@ -120,6 +134,8 @@ export class AuthService {
   static clearToken(): void {
     if (typeof window !== 'undefined') {
       localStorage.removeItem(TOKEN_KEY);
+      sessionStorage.removeItem(TOKEN_KEY);
+      console.log('Auth: Token cleared from storage');
     }
   }
   
