@@ -3,8 +3,9 @@
 import { useAuth } from '@/components/AuthProvider';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import TableOfContents from '@/components/TableOfContents';
+import { processHtmlContentLegacy as processHtmlContent } from '@/lib/heading-utils';
 
 interface PostData {
   id: string;
@@ -74,19 +75,8 @@ function PostContent({ post }: { post: PostData }) {
     );
   }
 
-  // 处理HTML内容，为标题添加ID属性
-  const processedHtml = post.contentHtml.replace(
-    /<h([1-6])[^>]*>([^<]+)<\/h([1-6])>/g,
-    (match, level, text) => {
-      const id = text
-        .toLowerCase()
-        .replace(/[^\w\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-')
-        .trim();
-      return `<h${level} id="${id}" class="scroll-mt-20">${text}</h${level}>`;
-    }
-  );
+  // 使用统一的函数处理HTML内容
+  const processedHtml = processHtmlContent(post.contentHtml);
 
   return (
     <article className="prose prose-lg max-w-none">
@@ -124,6 +114,7 @@ function BlogContent() {
   const params = useParams();
   const router = useRouter();
   const { isAuthenticated } = useAuth();
+  const hasHandledHash = useRef(false);
 
   useEffect(() => {
     // 如果没有认证，重定向到首页
@@ -155,6 +146,34 @@ function BlogContent() {
 
     loadPost();
   }, [params.id, isAuthenticated, router]);
+
+  // 处理hash导航
+  useEffect(() => {
+    if (!post || hasHandledHash.current) return;
+    
+    const handleHash = () => {
+      const hash = window.location.hash;
+      if (hash) {
+        const id = hash.substring(1); // 移除 #
+        const element = document.getElementById(id);
+        if (element) {
+          // 使用setTimeout确保DOM已完全渲染
+          setTimeout(() => {
+            element.scrollIntoView({ 
+              block: 'start'
+            });
+          }, 100);
+        }
+      }
+      hasHandledHash.current = true;
+    };
+
+    handleHash();
+    
+    // 监听hash变化
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, [post]);
 
   if (loading) {
     return (
@@ -224,6 +243,13 @@ export default function PostPage() {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
 
+  // 处理重定向逻辑
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push('/');
+    }
+  }, [isAuthenticated, isLoading, router]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -236,11 +262,6 @@ export default function PostPage() {
   }
 
   if (!isAuthenticated) {
-    // 使用 useEffect 重定向，避免在渲染过程中导航
-    useEffect(() => {
-      router.push('/');
-    }, [router]);
-    
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { generateHeadingId, parseHeadingsFromMarkdown } from '@/lib/heading-utils';
 
 interface TableOfContentsItem {
   id: string;
@@ -17,51 +18,68 @@ export default function TableOfContents({ content, onNavigate }: TableOfContents
   const [headings, setHeadings] = useState<TableOfContentsItem[]>([]);
   const [activeHeading, setActiveHeading] = useState<string>('');
 
+  // 解析标题并确保ID唯一性
   useEffect(() => {
     if (!content) return;
 
-    // 解析Markdown标题
-    const headingRegex = /^(#{1,6})\s+(.+)$/gm;
-    const matches: TableOfContentsItem[] = [];
-    let match;
+    // 使用统一的函数解析标题
+    const parsedHeadings = parseHeadingsFromMarkdown(content);
+    const existingIds = new Set<string>();
+    const uniqueHeadings: TableOfContentsItem[] = [];
 
-    while ((match = headingRegex.exec(content)) !== null) {
-      const level = match[1].length;
-      const text = match[2].trim();
+    // 确保ID唯一
+    parsedHeadings.forEach((heading) => {
+      let finalId = heading.id;
+      let counter = 1;
       
-      // 生成ID（移除特殊字符，转中文为拼音或直接使用）
-      const id = text
-        .toLowerCase()
-        .replace(/[^\w\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-')
-        .trim();
-
-      matches.push({
-        id,
-        text,
-        level
+      while (existingIds.has(finalId)) {
+        finalId = `${heading.id}-${counter}`;
+        counter++;
+      }
+      
+      existingIds.add(finalId);
+      uniqueHeadings.push({
+        ...heading,
+        id: finalId
       });
-    }
+    });
 
-    setHeadings(matches);
+    setHeadings(uniqueHeadings);
 
     // 设置第一个标题为活动状态
-    if (matches.length > 0 && !activeHeading) {
-      setActiveHeading(matches[0].id);
+    if (uniqueHeadings.length > 0 && !activeHeading) {
+      setActiveHeading(uniqueHeadings[0].id);
     }
   }, [content, activeHeading]);
 
-  // 监听滚动事件，更新活动标题
-  useEffect(() => {
-    const handleScroll = () => {
+  // 使用requestAnimationFrame优化滚动性能
+  const rafId = useRef<number | null>(null);
+  const lastScrollPosition = useRef(0);
+  
+  const handleScroll = useCallback(() => {
+    if (rafId.current !== null) return;
+    
+    rafId.current = requestAnimationFrame(() => {
+      const currentScrollPosition = window.scrollY;
+      
+      // 避免频繁更新
+      if (Math.abs(currentScrollPosition - lastScrollPosition.current) < 5) {
+        rafId.current = null;
+        return;
+      }
+      
+      lastScrollPosition.current = currentScrollPosition;
+      
       const headingElements = headings.map(h => 
         document.getElementById(h.id)
       ).filter(Boolean);
 
-      if (headingElements.length === 0) return;
+      if (headingElements.length === 0) {
+        rafId.current = null;
+        return;
+      }
 
-      const scrollPosition = window.scrollY + 100;
+      const scrollPosition = currentScrollPosition + 100;
       
       // 找到当前视窗内的标题
       let currentHeading = '';
@@ -76,21 +94,37 @@ export default function TableOfContents({ content, onNavigate }: TableOfContents
       if (currentHeading && currentHeading !== activeHeading) {
         setActiveHeading(currentHeading);
       }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    handleScroll(); // 初始检查
-
-    return () => window.removeEventListener('scroll', handleScroll);
+      
+      rafId.current = null;
+    });
   }, [headings, activeHeading]);
 
+  // 监听滚动事件，使用passive: true提升性能
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // 初始检查
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (rafId.current !== null) {
+        cancelAnimationFrame(rafId.current);
+      }
+    };
+  }, [handleScroll]);
+
+  // 处理标题点击
   const handleHeadingClick = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
+      // 更新URL hash但不触发滚动
+      const hash = `#${id}`;
+      history.pushState(null, '', hash);
+      
+      // 使用CSS scroll-behavior进行平滑滚动
       element.scrollIntoView({ 
-        behavior: 'smooth',
         block: 'start'
       });
+      
       setActiveHeading(id);
       if (onNavigate) {
         onNavigate(id);
