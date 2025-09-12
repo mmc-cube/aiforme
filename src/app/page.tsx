@@ -5,15 +5,8 @@ import LoginForm from '@/components/LoginForm';
 import Link from 'next/link';
 import { OptimizedPostList } from '@/components/OptimizedPostCard';
 import { LazyLoad } from '@/components/LazyLoading';
+import { useState, useEffect } from 'react';
 
-interface PostMeta {
-  id: string;
-  title: string;
-  date: string;
-  excerpt?: string;
-  tags?: string[];
-  author?: string;
-}
 
 function BlogHeader() {
   const { logout } = useAuth();
@@ -47,6 +40,16 @@ function BlogHeader() {
       </div>
     </header>
   );
+}
+
+
+interface PostMeta {
+  id: string;
+  title: string;
+  date: string;
+  excerpt?: string;
+  tags?: string[];
+  author?: string;
 }
 
 function PostCard({ post }: { post: PostMeta }) {
@@ -167,21 +170,7 @@ function BlogContent() {
               </div>
             </div>
             
-            {/* 文章统计 */}
-            <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">文章总览</h3>
-                  <p className="text-gray-600 text-sm">持续更新中</p>
-                </div>
-                <div className="text-right">
-                  <div className="text-3xl font-bold text-blue-600">{posts.length}</div>
-                  <div className="text-sm text-gray-500">篇文章</div>
-                </div>
-              </div>
-            </div>
-            
-            {/* 文章列表 */}
+            {/* 文章列表 - 已删除统计模块，保留文章显示 */}
             <LazyLoad>
               <OptimizedPostList 
                 posts={posts}
