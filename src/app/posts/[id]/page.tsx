@@ -195,8 +195,8 @@ function BlogContent() {
     <div className="min-h-screen bg-gray-50">
       <BlogHeader />
       
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex gap-6">
+      <main className="max-w-full px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex gap-8">
           {/* 左侧目录 */}
           {post.content && (
             <TableOfContents content={post.content} />

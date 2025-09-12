@@ -121,20 +121,20 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
   }
 
   return (
-    <nav className="w-80 bg-white border-r border-gray-200 p-6 sticky top-4 h-fit">
+    <nav className="w-96 bg-white border-r border-gray-200 p-8 sticky top-4 h-fit">
       <h3 className="text-lg font-bold text-gray-900 mb-6 pb-3 border-b border-gray-200">
         📋 文章目录
       </h3>
-      <ul className="space-y-2">
+      <ul className="space-y-3">
         {headings.map((heading) => (
           <li key={heading.id}>
             <div
-              className={`w-full text-left px-4 py-3 text-base rounded-lg transition-all duration-200 ${
+              className={`w-full text-left px-5 py-4 text-base rounded-lg transition-all duration-200 ${
                 activeHeading === heading.id
                   ? 'bg-blue-50 text-blue-700 font-semibold border-l-4 border-blue-500 shadow-sm'
                   : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
               }`}
-              style={{ paddingLeft: `${(heading.level - 1) * 16 + 16}px` }}
+              style={{ paddingLeft: `${(heading.level - 1) * 20 + 20}px` }}
               onMouseEnter={() => handleHeadingHover(heading.id)}
             >
               {heading.text}
