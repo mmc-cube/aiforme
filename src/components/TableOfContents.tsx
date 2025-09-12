@@ -51,70 +51,53 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
     }
   }, [content, activeHeading]);
 
-  // 使用requestAnimationFrame优化滚动性能
-  const rafId = useRef<number | null>(null);
-  const lastScrollPosition = useRef(0);
+  // 使用Intersection Observer实现精确的滚动高亮
+  const observerRef = useRef<IntersectionObserver | null>(null);
   
-  const handleScroll = useCallback(() => {
-    if (rafId.current !== null) return;
-    
-    rafId.current = requestAnimationFrame(() => {
-      const currentScrollPosition = window.scrollY;
-      
-      // 避免频繁更新
-      if (Math.abs(currentScrollPosition - lastScrollPosition.current) < 5) {
-        rafId.current = null;
-        return;
-      }
-      
-      lastScrollPosition.current = currentScrollPosition;
-      
-      const headingElements = headings.map(h => 
-        document.getElementById(h.id)
-      ).filter(Boolean);
-
-      if (headingElements.length === 0) {
-        rafId.current = null;
-        return;
-      }
-
-      const scrollPosition = currentScrollPosition + 100;
-      
-      // 找到当前视窗内的标题
-      let currentHeading = '';
-      for (let i = headingElements.length - 1; i >= 0; i--) {
-        const element = headingElements[i];
-        if (element && element.offsetTop <= scrollPosition) {
-          currentHeading = element.id || '';
-          break;
-        }
-      }
-
-      if (currentHeading && currentHeading !== activeHeading) {
-        setActiveHeading(currentHeading);
-      }
-      
-      rafId.current = null;
-    });
-  }, [headings, activeHeading]);
-
-  // 监听滚动事件，使用passive: true提升性能
   useEffect(() => {
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // 初始检查
+    if (headings.length === 0) return;
+
+    // 清理之前的observer
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
+
+    // 创建Intersection Observer
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        // 找到所有正在相交的标题
+        const intersectingEntries = entries.filter(entry => entry.isIntersecting);
+        
+        if (intersectingEntries.length > 0) {
+          // 找到最顶部的相交标题
+          const topEntry = intersectingEntries.reduce((prev, current) => {
+            return prev.boundingClientRect.top < current.boundingClientRect.top ? prev : current;
+          });
+          
+          const headingId = topEntry.target.id;
+          if (headingId && headingId !== activeHeading) {
+            setActiveHeading(headingId);
+          }
+        }
+      },
+      {
+        rootMargin: '-80px 0px -70% 0px', // 顶部偏移80px，底部偏移70%
+        threshold: 0.1 // 10%的标题可见就触发
+      }
+    );
+
+    // 观察所有标题元素
+    headings.forEach(heading => {
+      const element = document.getElementById(heading.id);
+      if (element) {
+        observerRef.current?.observe(element);
+      }
+    });
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
-      if (rafId.current !== null) {
-        cancelAnimationFrame(rafId.current);
-      }
+      observerRef.current?.disconnect();
     };
-  }, [handleScroll]);
-
-  // 移除跳转功能，仅保留视觉反馈
-  const handleHeadingHover = (id: string) => {
-    // 可以在这里添加悬停效果或预览功能
-  };
+  }, [headings, activeHeading]);
 
   if (headings.length === 0) {
     return null;
@@ -135,7 +118,6 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
                   : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
               }`}
               style={{ paddingLeft: `${(heading.level - 1) * 20 + 20}px` }}
-              onMouseEnter={() => handleHeadingHover(heading.id)}
             >
               {heading.text}
             </div>
