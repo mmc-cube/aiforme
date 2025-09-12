@@ -4,6 +4,7 @@ import { useAuth } from '@/components/AuthProvider';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import TableOfContents from '@/components/TableOfContents';
 
 interface PostData {
   id: string;
@@ -13,6 +14,7 @@ interface PostData {
   tags?: string[];
   author?: string;
   contentHtml?: string;
+  content?: string;
 }
 
 function BlogHeader() {
@@ -72,6 +74,20 @@ function PostContent({ post }: { post: PostData }) {
     );
   }
 
+  // 处理HTML内容，为标题添加ID属性
+  const processedHtml = post.contentHtml.replace(
+    /<h([1-6])[^>]*>([^<]+)<\/h([1-6])>/g,
+    (match, level, text) => {
+      const id = text
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .trim();
+      return `<h${level} id="${id}" class="scroll-mt-20">${text}</h${level}>`;
+    }
+  );
+
   return (
     <article className="prose prose-lg max-w-none">
       <div className="mb-8">
@@ -79,7 +95,6 @@ function PostContent({ post }: { post: PostData }) {
           {post.title}
         </h1>
         
-          
         {post.tags && post.tags.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-6">
             {post.tags.map((tag) => (
@@ -96,7 +111,7 @@ function PostContent({ post }: { post: PostData }) {
       
       <div 
         className="prose prose-lg max-w-none prose-headings:font-semibold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:text-gray-700 prose-p:leading-relaxed"
-        dangerouslySetInnerHTML={{ __html: post.contentHtml }} 
+        dangerouslySetInnerHTML={{ __html: processedHtml }} 
       />
     </article>
   );
@@ -188,9 +203,17 @@ function BlogContent() {
     <div className="min-h-screen bg-gray-50">
       <BlogHeader />
       
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-          <PostContent post={post} />
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex gap-8">
+          {/* 主要内容区域 */}
+          <div className="flex-1 bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+            <PostContent post={post} />
+          </div>
+          
+          {/* 右侧目录 */}
+          {post.content && (
+            <TableOfContents content={post.content} />
+          )}
         </div>
       </main>
     </div>

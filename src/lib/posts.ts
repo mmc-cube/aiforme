@@ -14,6 +14,7 @@ export interface PostData {
   tags?: string[];
   author?: string;
   contentHtml?: string;
+  content?: string; // 添加原始Markdown内容
 }
 
 export interface PostMeta {
@@ -92,6 +93,7 @@ export async function getPostData(id: string): Promise<PostData | null> {
     return {
       id,
       contentHtml,
+      content: matterResult.content, // 添加原始Markdown内容
       title: matterResult.data.title || id,
       date: matterResult.data.date || '1970-01-01',
       excerpt: matterResult.data.excerpt || '',
