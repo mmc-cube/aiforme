@@ -53,22 +53,7 @@ function PostCard({ post }: { post: PostMeta }) {
           </Link>
         </h2>
         
-        <div className="flex items-center text-sm text-gray-500 mb-3">
-          <time dateTime={post.date}>
-            {new Date(post.date).toLocaleDateString('zh-CN', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            })}
-          </time>
-          {post.author && (
-            <>
-              <span className="mx-2">•</span>
-              <span>{post.author}</span>
-            </>
-          )}
-        </div>
-        
+          
         {post.excerpt && (
           <p className="text-gray-700 leading-relaxed">
             {post.excerpt}

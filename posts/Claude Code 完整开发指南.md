@@ -1,10 +1,3 @@
----
-title: "Claude Code 完整开发指南"
-date: "2024-09-11"
-excerpt: "一份从入门到精通的综合实践手册，代表了 AI 辅助编程的新范式。"
-tags: ["Claude Code", "AI编程", "开发指南"]
-author: "Nickey103"
----
 
 # Claude Code 完整开发指南
 

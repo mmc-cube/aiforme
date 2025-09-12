@@ -79,22 +79,7 @@ function PostContent({ post }: { post: PostData }) {
           {post.title}
         </h1>
         
-        <div className="flex items-center text-sm text-gray-500 mb-6 pb-6 border-b border-gray-200">
-          <time dateTime={post.date}>
-            {new Date(post.date).toLocaleDateString('zh-CN', {
-              year: 'numeric',
-              month: 'long', 
-              day: 'numeric'
-            })}
-          </time>
-          {post.author && (
-            <>
-              <span className="mx-2">•</span>
-              <span>作者：{post.author}</span>
-            </>
-          )}
-        </div>
-        
+          
         {post.tags && post.tags.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-6">
             {post.tags.map((tag) => (
