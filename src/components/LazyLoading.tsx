@@ -65,21 +65,23 @@ export function LazyLoad({
 }
 
 interface CodeSplitProps {
-  importFn: () => Promise<{ default: React.ComponentType<any> }>;
+  importFn: () => Promise<any>;
   fallback?: React.ReactNode;
   componentName?: string;
   props?: any;
+  exportName?: string; // 支持命名导出
 }
 
 /**
  * 代码分割组件
- * 动态导入React组件
+ * 动态导入React组件，支持默认导出和命名导出
  */
 export function CodeSplit({
   importFn,
   fallback = <div className="animate-pulse bg-gray-200 rounded-lg p-4">Loading...</div>,
   componentName = 'Component',
-  props = {}
+  props = {},
+  exportName = 'default' // 默认使用default导出
 }: CodeSplitProps) {
   const [Component, setComponent] = useState<React.ComponentType<any> | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -89,9 +91,15 @@ export function CodeSplit({
 
     const loadComponent = async () => {
       try {
-        const module = await importFn();
+        const moduleResult = await importFn();
         if (isMounted) {
-          setComponent(() => module.default);
+          // 支持默认导出和命名导出
+          const componentToLoad = exportName === 'default' ? moduleResult.default : moduleResult[exportName];
+          if (componentToLoad) {
+            setComponent(() => componentToLoad);
+          } else {
+            throw new Error(`Component ${exportName} not found in module`);
+          }
         }
       } catch (err) {
         if (isMounted) {
@@ -105,7 +113,7 @@ export function CodeSplit({
     return () => {
       isMounted = false;
     };
-  }, [importFn]);
+  }, [importFn, exportName]);
 
   if (error) {
     return (
@@ -312,6 +320,7 @@ export const LazyAuthProvider = () => (
   <CodeSplit
     importFn={() => import('@/components/AuthProvider')}
     componentName="AuthProvider"
+    exportName="AuthProvider" // 使用命名导出
   />
 );
 

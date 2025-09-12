@@ -128,7 +128,19 @@ export class IntelligentPrefetchManager {
       }
     }
     
-    return [...new Set(predictions)].slice(0, 5);
+    const uniqueSet = new Set(predictions);
+    const result: string[] = [];
+    const iterator = uniqueSet.values();
+    let item = iterator.next();
+    let count = 0;
+    
+    while (!item.done && count < 5) {
+      result.push(item.value);
+      item = iterator.next();
+      count++;
+    }
+    
+    return result;
   }
 
   /**
@@ -206,7 +218,16 @@ export class IntelligentPrefetchManager {
     this.cleanupExpiredCache();
     
     // 过滤已缓存或正在预取的URL
-    const uniqueUrls = [...new Set(urls)];
+    const urlSet = new Set(urls);
+    const uniqueUrls: string[] = [];
+    const iterator = urlSet.values();
+    let item = iterator.next();
+    
+    while (!item.done) {
+      uniqueUrls.push(item.value);
+      item = iterator.next();
+    }
+    
     const urlsToPrefetch = uniqueUrls.filter(url => 
       !this.cache.has(url) && !this.prefetchQueue.has(url)
     );
@@ -258,15 +279,28 @@ export class IntelligentPrefetchManager {
    */
   private cleanupExpiredCache(): void {
     const now = Date.now();
-    for (const [url, entry] of this.cache.entries()) {
-      if (now > entry.expiresAt) {
+    const entries = this.cache.entries();
+    let entry = entries.next();
+    
+    while (!entry.done) {
+      const [url, cacheEntry] = entry.value;
+      if (now > cacheEntry.expiresAt) {
         this.cache.delete(url);
       }
+      entry = entries.next();
     }
 
     // 如果缓存过大，删除最旧的条目
     if (this.cache.size > this.config.maxCacheSize) {
-      const entries = Array.from(this.cache.entries());
+      const entries: [string, any][] = [];
+      const iterator = this.cache.entries();
+      let item = iterator.next();
+      
+      while (!item.done) {
+        entries.push(item.value);
+        item = iterator.next();
+      }
+      
       entries.sort((a, b) => a[1].timestamp - b[1].timestamp);
       
       const toDelete = entries.slice(0, this.cache.size - this.config.maxCacheSize);

@@ -74,11 +74,15 @@ export class APICache<T> {
     let oldestKey: string | null = null;
     let oldestAccess = Infinity;
 
-    for (const [key, item] of this.cache.entries()) {
+    const entries = this.cache.entries();
+    let entry = entries.next();
+    while (!entry.done) {
+      const [key, item] = entry.value;
       if (item.lastAccessed < oldestAccess) {
         oldestAccess = item.lastAccessed;
         oldestKey = key;
       }
+      entry = entries.next();
     }
 
     if (oldestKey) {
@@ -214,15 +218,33 @@ export class APICache<T> {
     isExpired: boolean;
   }> {
     const now = Date.now();
-    return Array.from(this.cache.entries()).map(([key, item]) => ({
-      key,
-      data: item.data,
-      ttl: item.ttl,
-      age: now - item.timestamp,
-      accessCount: item.accessCount,
-      lastAccessed: item.lastAccessed,
-      isExpired: this.isExpired(item)
-    }));
+    const result: Array<{
+      key: string;
+      data: T;
+      ttl: number;
+      age: number;
+      accessCount: number;
+      lastAccessed: number;
+      isExpired: boolean;
+    }> = [];
+    
+    const entries = this.cache.entries();
+    let entry = entries.next();
+    while (!entry.done) {
+      const [key, item] = entry.value;
+      result.push({
+        key,
+        data: item.data,
+        ttl: item.ttl,
+        age: now - item.timestamp,
+        accessCount: item.accessCount,
+        lastAccessed: item.lastAccessed,
+        isExpired: this.isExpired(item)
+      });
+      entry = entries.next();
+    }
+    
+    return result;
   }
 }
 

@@ -1,6 +1,6 @@
 import { remark } from 'remark';
 import html from 'remark-html';
-import { Cache } from './cache';
+import { APICache } from './cache';
 
 interface MarkdownCacheEntry {
   html: string;
@@ -9,15 +9,12 @@ interface MarkdownCacheEntry {
 }
 
 export class MarkdownOptimizer {
-  private cache: Cache<string, MarkdownCacheEntry>;
+  private cache: APICache<MarkdownCacheEntry>;
   private processingQueue = new Map<string, Promise<string>>();
   private remarkProcessor: any;
 
   constructor() {
-    this.cache = new Cache({
-      maxSize: 100, // 最多缓存100个文档
-      ttl: 30 * 60 * 1000, // 30分钟TTL
-    });
+    this.cache = new APICache<MarkdownCacheEntry>(100);
 
     // 预编译remark处理器
     this.remarkProcessor = remark().use(html, {
@@ -48,7 +45,7 @@ export class MarkdownOptimizer {
     const cacheKey = filePath || fileHash;
 
     // 检查缓存
-    const cached = this.cache.get(cacheKey);
+    const cached = this.cache.get('markdown', cacheKey);
     if (cached && cached.fileHash === fileHash) {
       return cached.html;
     }
@@ -85,11 +82,11 @@ export class MarkdownOptimizer {
       const html = processedContent.toString();
 
       // 缓存结果
-      this.cache.set('default', {
+      this.cache.set('markdown', 'default', {
         html,
         processedAt: Date.now(),
         fileHash,
-      });
+      }, 30 * 60 * 1000);
 
       return html;
     } catch (error) {
@@ -109,11 +106,11 @@ export class MarkdownOptimizer {
         .process(content)
         .then((processedContent: any) => {
           const html = processedContent.toString();
-          this.cache.set('default', {
+          this.cache.set('markdown', 'default', {
             html,
             processedAt: Date.now(),
             fileHash,
-          });
+          }, 30 * 60 * 1000);
           resolve(html);
         })
         .catch(reject);
@@ -149,8 +146,9 @@ export class MarkdownOptimizer {
    * 获取缓存统计
    */
   getCacheStats() {
+    const stats = this.cache.getStats();
     return {
-      cacheSize: this.cache.size,
+      cacheSize: stats.size,
       processingQueueSize: this.processingQueue.size,
     };
   }

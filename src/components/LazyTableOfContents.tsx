@@ -229,8 +229,12 @@ export function EnhancedTableOfContents({
 
     // 从内容中提取可能的内部链接
     const linkRegex = /\[([^\]]+)\]\((\/posts\/[^)]+)\)/g;
-    const matches = [...content.matchAll(linkRegex)];
-    const postLinks = matches.map(match => match[2]).slice(0, 3); // 最多3个
+    const matches: string[] = [];
+    let match;
+    while ((match = linkRegex.exec(content)) !== null) {
+      matches.push(match[2]);
+    }
+    const postLinks = matches.slice(0, 3); // 最多3个
 
     if (postLinks.length > 0) {
       setRelatedPosts(postLinks);

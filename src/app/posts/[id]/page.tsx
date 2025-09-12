@@ -204,7 +204,7 @@ function BlogContent() {
         <div className="flex gap-8">
           {/* 左侧目录 */}
           {post.content && (
-            <LazyLoad delay={500}>
+            <LazyLoad>
               <EnhancedTableOfContents 
                 content={post.content}
                 enableSmoothScroll={true}

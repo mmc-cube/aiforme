@@ -11,7 +11,7 @@ export function withCache(
     sMaxAge?: number;
     staleWhileRevalidate?: number;
     mustRevalidate?: boolean;
-    private?: boolean;
+    isPrivate?: boolean;
   } = {}
 ) {
   const {
@@ -19,7 +19,7 @@ export function withCache(
     sMaxAge = 600, // 10分钟CDN缓存
     staleWhileRevalidate = 86400, // 24小时后台刷新
     mustRevalidate = true,
-    private = false
+    isPrivate = false
   } = options;
 
   return async (req: Request, context: any) => {
@@ -27,7 +27,7 @@ export function withCache(
 
     // 添加缓存控制头
     const cacheDirectives = [
-      private ? 'private' : 'public',
+      isPrivate ? 'private' : 'public',
       `max-age=${maxAge}`,
       `s-maxage=${sMaxAge}`,
       `stale-while-revalidate=${staleWhileRevalidate}`,
@@ -122,7 +122,7 @@ export function generateCacheControl(options: {
   mustRevalidate?: boolean;
   noCache?: boolean;
   noStore?: boolean;
-  private?: boolean;
+  isPrivate?: boolean;
   immutable?: boolean;
 } = {}): string {
   const directives: string[] = [];
@@ -132,7 +132,7 @@ export function generateCacheControl(options: {
   } else if (options.noCache) {
     directives.push('no-cache');
   } else {
-    directives.push(options.private ? 'private' : 'public');
+    directives.push(options.isPrivate ? 'private' : 'public');
     
     if (options.maxAge) {
       directives.push(`max-age=${options.maxAge}`);

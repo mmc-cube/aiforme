@@ -2,6 +2,8 @@
  * 性能监控和报告工具
  */
 
+import { useState, useEffect } from 'react';
+
 export interface PerformanceMetrics {
   // 加载性能
   firstContentfulPaint: number;
@@ -70,7 +72,7 @@ export class PerformanceMonitor {
 
     // First Input Delay
     this.observeMetric('first-input', (entries) => {
-      const fidEntry = entries[0];
+      const fidEntry = entries[0] as any;
       if (fidEntry) {
         this.metrics.firstInputDelay = fidEntry.processingStart - fidEntry.startTime;
         this.reportMetric('FID', this.metrics.firstInputDelay);
@@ -79,7 +81,7 @@ export class PerformanceMonitor {
 
     // Cumulative Layout Shift
     this.observeMetric('layout-shift', (entries) => {
-      const clsValue = entries.reduce((sum, entry) => sum + entry.value, 0);
+      const clsValue = entries.reduce((sum, entry: any) => sum + entry.value, 0);
       this.metrics.cumulativeLayoutShift = clsValue;
       this.reportMetric('CLS', clsValue);
     });
@@ -127,7 +129,7 @@ export class PerformanceMonitor {
         
         // 报告单个API调用
         if (args[0] && typeof args[0] === 'string') {
-          this.reportApiMetric(args[0], duration);
+          this.reportApiMetric(String(args[0]), duration);
         }
         
         return response;
@@ -135,7 +137,7 @@ export class PerformanceMonitor {
         const endTime = performance.now();
         const duration = endTime - startTime;
         
-        this.reportApiMetric(args[0] || 'unknown', duration, true);
+        this.reportApiMetric(String(args[0]) || 'unknown', duration, true);
         throw error;
       }
     };
