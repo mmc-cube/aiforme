@@ -71,18 +71,9 @@ function PostCard({ post }: { post: PostMeta }) {
       </div>
       
       <div className="flex items-center justify-between">
-        {post.date && (
-          <div className="flex items-center text-sm text-gray-500">
-            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            {new Date(post.date).toLocaleDateString('zh-CN')}
-          </div>
-        )}
-        
         {post.tags && post.tags.length > 0 && (
           <div className="flex flex-wrap gap-2">
-            {post.tags.slice(0, 2).map((tag) => (
+            {post.tags.slice(0, 3).map((tag) => (
               <span
                 key={tag}
                 className="inline-block bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 text-xs px-2 py-1 rounded-full border border-blue-100"
@@ -90,9 +81,9 @@ function PostCard({ post }: { post: PostMeta }) {
                 {tag}
               </span>
             ))}
-            {post.tags.length > 2 && (
+            {post.tags.length > 3 && (
               <span className="inline-block bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">
-                +{post.tags.length - 2}
+                +{post.tags.length - 3}
               </span>
             )}
           </div>
