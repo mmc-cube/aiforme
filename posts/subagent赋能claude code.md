@@ -1,3 +1,11 @@
+---
+title: "Claude Code的Sub Agents前后端并行"
+date: "2024-09-11"
+excerpt: "深度解析Claude Code的Sub Agents功能，解决AI编程中上下文混乱的核心痛点。"
+tags: ["Claude Code", "Sub Agents", "AI编程", "前后端分离", "技术架构"]
+author: "技术博主"
+---
+
 # Claude Code的Sub Agents 前后端并行
 
 Claude Code最近推出的Sub Agents功能让我很感兴趣，这可能是AI编程工具的一个重要进化方向。
