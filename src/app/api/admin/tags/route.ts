@@ -12,7 +12,10 @@ export async function GET(request: NextRequest) {
     }
 
     // 获取查询参数
-    const { search, page = '1', limit = '20' } = new URL(request.url).searchParams;
+    const searchParams = new URL(request.url).searchParams;
+    const search = searchParams.get('search') || '';
+    const page = searchParams.get('page') || '1';
+    const limit = searchParams.get('limit') || '20';
     const pageNum = parseInt(page);
     const limitNum = parseInt(limit);
     const offset = (pageNum - 1) * limitNum;

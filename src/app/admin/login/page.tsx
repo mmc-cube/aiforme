@@ -51,6 +51,9 @@ export default function LoginPage() {
           <p className="mt-2 text-center text-sm text-gray-600">
             请登录以管理博客内容
           </p>
+          <p className="mt-1 text-center text-xs text-blue-600">
+            正确访问地址: /admin/login (不带末尾斜杠)
+          </p>
         </div>
         
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>

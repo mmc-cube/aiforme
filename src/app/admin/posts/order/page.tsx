@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { PostData } from '@/types/admin';
 import { PostOrder } from '@/components/admin/PostOrder';
-import { AdminLayout } from '@/components/admin/AdminLayout';
-import { useAuth } from '@/components/AuthProvider';
+import AdminLayout from '@/components/admin/AdminLayout';
+import { useAuth } from '@/components/admin/AuthProvider';
 
 export default function PostOrderPage() {
   const [posts, setPosts] = useState<PostData[]>([]);
@@ -13,18 +13,18 @@ export default function PostOrderPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const router = useRouter();
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
+    if (!authLoading && !user) {
       router.push('/admin/login');
       return;
     }
 
-    if (isAuthenticated) {
+    if (user) {
       fetchPosts();
     }
-  }, [isAuthenticated, authLoading, router]);
+  }, [user, authLoading, router]);
 
   const fetchPosts = async () => {
     try {
@@ -90,7 +90,7 @@ export default function PostOrderPage() {
     }
   };
 
-  if (authLoading || !isAuthenticated) {
+  if (authLoading || !user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
