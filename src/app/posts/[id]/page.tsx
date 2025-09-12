@@ -114,7 +114,6 @@ function BlogContent() {
   const params = useParams();
   const router = useRouter();
   const { isAuthenticated } = useAuth();
-  const hasHandledHash = useRef(false);
 
   useEffect(() => {
     // 如果没有认证，重定向到首页
@@ -147,33 +146,7 @@ function BlogContent() {
     loadPost();
   }, [params.id, isAuthenticated, router]);
 
-  // 处理hash导航
-  useEffect(() => {
-    if (!post || hasHandledHash.current) return;
-    
-    const handleHash = () => {
-      const hash = window.location.hash;
-      if (hash) {
-        const id = hash.substring(1); // 移除 #
-        const element = document.getElementById(id);
-        if (element) {
-          // 使用setTimeout确保DOM已完全渲染
-          setTimeout(() => {
-            element.scrollIntoView({ 
-              block: 'start'
-            });
-          }, 100);
-        }
-      }
-      hasHandledHash.current = true;
-    };
-
-    handleHash();
-    
-    // 监听hash变化
-    window.addEventListener('hashchange', handleHash);
-    return () => window.removeEventListener('hashchange', handleHash);
-  }, [post]);
+  // 移除hash导航功能，仅保留滚动高亮
 
   if (loading) {
     return (
@@ -223,16 +196,16 @@ function BlogContent() {
       <BlogHeader />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex gap-8">
+        <div className="flex gap-6">
+          {/* 左侧目录 */}
+          {post.content && (
+            <TableOfContents content={post.content} />
+          )}
+          
           {/* 主要内容区域 */}
           <div className="flex-1 bg-white rounded-lg shadow-sm border border-gray-200 p-8">
             <PostContent post={post} />
           </div>
-          
-          {/* 右侧目录 */}
-          {post.content && (
-            <TableOfContents content={post.content} />
-          )}
         </div>
       </main>
     </div>

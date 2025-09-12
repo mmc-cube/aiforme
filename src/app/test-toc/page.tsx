@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import TableOfContents from '@/components/TableOfContents';
 import { processHtmlContent } from '@/lib/heading-utils';
@@ -75,7 +77,7 @@ export default function TableOfContentsTest() {
         results.push({
           name: '中文标题ID生成',
           status: '❌ 错误',
-          details: `测试出错: ${error.message}`
+          details: `测试出错: ${error instanceof Error ? error.message : '未知错误'}`
         });
       }
 
@@ -92,7 +94,7 @@ export default function TableOfContentsTest() {
         results.push({
           name: '中英文混合标题处理',
           status: '❌ 错误',
-          details: `测试出错: ${error.message}`
+          details: `测试出错: ${error instanceof Error ? error.message : '未知错误'}`
         });
       }
 
@@ -110,7 +112,7 @@ export default function TableOfContentsTest() {
         results.push({
           name: '重复ID自动处理',
           status: '❌ 错误',
-          details: `测试出错: ${error.message}`
+          details: `测试出错: ${error instanceof Error ? error.message : '未知错误'}`
         });
       }
 
@@ -127,7 +129,7 @@ export default function TableOfContentsTest() {
         results.push({
           name: '特殊字符处理',
           status: '❌ 错误',
-          details: `测试出错: ${error.message}`
+          details: `测试出错: ${error instanceof Error ? error.message : '未知错误'}`
         });
       }
 
@@ -144,7 +146,7 @@ export default function TableOfContentsTest() {
         results.push({
           name: '长标题处理',
           status: '❌ 错误',
-          details: `测试出错: ${error.message}`
+          details: `测试出错: ${error instanceof Error ? error.message : '未知错误'}`
         });
       }
 
@@ -161,7 +163,7 @@ export default function TableOfContentsTest() {
         results.push({
           name: '平滑滚动支持',
           status: '❌ 错误',
-          details: `测试出错: ${error.message}`
+          details: `测试出错: ${error instanceof Error ? error.message : '未知错误'}`
         });
       }
 

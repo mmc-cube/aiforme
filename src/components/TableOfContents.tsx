@@ -11,10 +11,9 @@ interface TableOfContentsItem {
 
 interface TableOfContentsProps {
   content: string;
-  onNavigate?: (id: string) => void;
 }
 
-export default function TableOfContents({ content, onNavigate }: TableOfContentsProps) {
+export default function TableOfContents({ content }: TableOfContentsProps) {
   const [headings, setHeadings] = useState<TableOfContentsItem[]>([]);
   const [activeHeading, setActiveHeading] = useState<string>('');
 
@@ -112,24 +111,9 @@ export default function TableOfContents({ content, onNavigate }: TableOfContents
     };
   }, [handleScroll]);
 
-  // 处理标题点击
-  const handleHeadingClick = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      // 更新URL hash但不触发滚动
-      const hash = `#${id}`;
-      history.pushState(null, '', hash);
-      
-      // 使用CSS scroll-behavior进行平滑滚动
-      element.scrollIntoView({ 
-        block: 'start'
-      });
-      
-      setActiveHeading(id);
-      if (onNavigate) {
-        onNavigate(id);
-      }
-    }
+  // 移除跳转功能，仅保留视觉反馈
+  const handleHeadingHover = (id: string) => {
+    // 可以在这里添加悬停效果或预览功能
   };
 
   if (headings.length === 0) {
@@ -137,22 +121,24 @@ export default function TableOfContents({ content, onNavigate }: TableOfContents
   }
 
   return (
-    <nav className="w-64 bg-white border-l border-gray-200 p-4 sticky top-4 h-fit">
-      <h3 className="text-sm font-semibold text-gray-900 mb-3">文章目录</h3>
-      <ul className="space-y-1">
+    <nav className="w-80 bg-white border-r border-gray-200 p-6 sticky top-4 h-fit">
+      <h3 className="text-lg font-bold text-gray-900 mb-6 pb-3 border-b border-gray-200">
+        📋 文章目录
+      </h3>
+      <ul className="space-y-2">
         {headings.map((heading) => (
           <li key={heading.id}>
-            <button
-              onClick={() => handleHeadingClick(heading.id)}
-              className={`w-full text-left px-2 py-1 text-sm rounded transition-colors ${
+            <div
+              className={`w-full text-left px-4 py-3 text-base rounded-lg transition-all duration-200 ${
                 activeHeading === heading.id
-                  ? 'bg-indigo-50 text-indigo-700 font-medium'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  ? 'bg-blue-50 text-blue-700 font-semibold border-l-4 border-blue-500 shadow-sm'
+                  : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
               }`}
-              style={{ paddingLeft: `${(heading.level - 1) * 12 + 8}px` }}
+              style={{ paddingLeft: `${(heading.level - 1) * 16 + 16}px` }}
+              onMouseEnter={() => handleHeadingHover(heading.id)}
             >
               {heading.text}
-            </button>
+            </div>
           </li>
         ))}
       </ul>
