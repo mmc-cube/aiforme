@@ -1,9 +1,7 @@
 ---
 title: "Gemini-CLI 终极使用教程"
-date: "2024-09-11"
 excerpt: "从入门到精通的完整指南，释放AI编程伙伴的全部潜力。"
 tags: ["Gemini-CLI", "AI编程", "命令行工具"]
-author: "技术博主"
 ---
 
 # Gemini-CLI 终极使用教程

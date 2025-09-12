@@ -4,8 +4,9 @@ import { useAuth } from '@/components/AuthProvider';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
-import TableOfContents from '@/components/TableOfContents';
+import { EnhancedTableOfContents } from '@/components/LazyTableOfContents';
 import { processHtmlContentLegacy as processHtmlContent } from '@/lib/heading-utils';
+import { LazyLoad } from '@/components/LazyLoading';
 
 interface PostData {
   id: string;
@@ -203,7 +204,13 @@ function BlogContent() {
         <div className="flex gap-8">
           {/* 左侧目录 */}
           {post.content && (
-            <TableOfContents content={post.content} />
+            <LazyLoad delay={500}>
+              <EnhancedTableOfContents 
+                content={post.content}
+                enableSmoothScroll={true}
+                enablePrefetch={true}
+              />
+            </LazyLoad>
           )}
           
           {/* 主要内容区域 */}

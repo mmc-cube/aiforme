@@ -16,7 +16,11 @@ export async function GET(
       );
     }
     
-    return NextResponse.json(post);
+    const response = NextResponse.json(post);
+    response.headers.set('Cache-Control', 'public, max-age=600');
+    response.headers.set('X-Cache', 'MISS');
+    
+    return response;
   } catch (error) {
     console.error('Error fetching post:', error);
     return NextResponse.json(

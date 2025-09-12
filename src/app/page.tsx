@@ -3,8 +3,8 @@
 import { useAuth } from '@/components/AuthProvider';
 import LoginForm from '@/components/LoginForm';
 import Link from 'next/link';
-import { getAllPostsMetadata } from '@/lib/posts';
-import { useState, useEffect } from 'react';
+import { OptimizedPostList } from '@/components/OptimizedPostCard';
+import { LazyLoad } from '@/components/LazyLoading';
 
 interface PostMeta {
   id: string;
@@ -182,11 +182,13 @@ function BlogContent() {
             </div>
             
             {/* 文章列表 */}
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-1">
-              {posts.map((post) => (
-                <PostCard key={post.id} post={post} />
-              ))}
-            </div>
+            <LazyLoad>
+              <OptimizedPostList 
+                posts={posts}
+                enableIntelligentPrefetch={true}
+                batchSize={6}
+              />
+            </LazyLoad>
           </div>
         )}
       </main>
