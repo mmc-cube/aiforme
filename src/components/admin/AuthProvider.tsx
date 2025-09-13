@@ -14,6 +14,7 @@ interface AuthContextType {
   login: (username: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   checkAuthStatus: () => Promise<void>;
+  refreshAuth: () => Promise<void>; // 新增：手动刷新认证状态
 }
 
 const AdminAuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -21,6 +22,7 @@ const AdminAuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AdminUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(false); // 防止重复检查
 
   // 检查登录状态
   useEffect(() => {
@@ -46,18 +48,26 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const checkAuthStatus = async () => {
+    // 防止重复检查
+    if (isCheckingAuth) {
+      console.log('⚠️ [Admin Auth] 认证检查已在进行中，跳过重复检查');
+      return;
+    }
+
+    setIsCheckingAuth(true);
+
     try {
       console.log('🔍 [Admin Auth] 开始检查认证状态...');
-      
+
       // 检测浏览器类型
       const userAgent = navigator.userAgent.toLowerCase();
       const isEdge = userAgent.indexOf('edge') > -1 || userAgent.indexOf('edg/') > -1;
-      console.log('🌐 [Admin Auth] 浏览器检测:', { 
+      console.log('🌐 [Admin Auth] 浏览器检测:', {
         userAgent: userAgent.substring(0, 100),
         isEdge,
-        cookiesEnabled: navigator.cookieEnabled 
+        cookiesEnabled: navigator.cookieEnabled
       });
-      
+
       const response = await fetch('/api/admin/auth/verify', {
         method: 'GET',
         credentials: 'include',
@@ -96,6 +106,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
     } finally {
       setLoading(false);
+      setIsCheckingAuth(false);
       console.log('🏁 [Admin Auth] 认证检查完成，loading状态设置为false');
     }
   };
@@ -200,8 +211,15 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // 手动刷新认证状态的函数
+  const refreshAuth = async () => {
+    console.log('🔄 [Admin Auth] 手动刷新认证状态');
+    setLoading(true);
+    await checkAuthStatus();
+  };
+
   return (
-    <AdminAuthContext.Provider value={{ user, loading, login, logout, checkAuthStatus }}>
+    <AdminAuthContext.Provider value={{ user, loading, login, logout, checkAuthStatus, refreshAuth }}>
       {children}
     </AdminAuthContext.Provider>
   );

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { AdminGuard } from '@/components/admin/AdminGuard';
 
 interface DashboardStats {
   totalPosts: number;
@@ -238,3 +239,14 @@ export default function AdminDashboard() {
     </div>
   );
 }
+
+// 使用 AdminGuard 包装整个页面
+function WrappedAdminDashboard() {
+  return (
+    <AdminGuard>
+      <AdminDashboard />
+    </AdminGuard>
+  );
+}
+
+export default WrappedAdminDashboard;

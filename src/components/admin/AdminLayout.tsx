@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAdminAuth } from '@/components/admin/AuthProvider';
 import { log } from '@/lib/unified-logger';
 
@@ -13,7 +13,16 @@ interface AdminLayoutProps {
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const auth = useAdminAuth();
+
+  // 自动重定向到登录页面（如果未认证）
+  useEffect(() => {
+    if (!auth.loading && !auth.user && pathname !== '/admin/login') {
+      console.log('🔄 [AdminLayout] 用户未认证，重定向到登录页面');
+      router.push('/admin/login');
+    }
+  }, [auth.loading, auth.user, pathname, router]);
 
   const navigation = [
     { name: '仪表板', href: '/admin', icon: '📊' },
@@ -42,18 +51,19 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     );
   }
 
-  // 未登录状态
+  // 未登录状态 - 由于自动重定向，这个情况应该很少见
   if (!auth.user) {
+    // 如果是登录页面，直接渲染内容
+    if (pathname === '/admin/login' || pathname.startsWith('/admin/login/')) {
+      return <>{children}</>;
+    }
+
+    // 其他情况显示加载状态（会立即被重定向）
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-600 mb-4">请先登录</p>
-          <Link
-            href="/admin/login"
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-          >
-            前往登录
-          </Link>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">正在跳转到登录页面...</p>
         </div>
       </div>
     );
