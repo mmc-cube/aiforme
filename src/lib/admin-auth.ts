@@ -4,6 +4,22 @@ import db from '@/lib/database';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
+// 增强的JWT配置
+const JWT_OPTIONS = {
+  expiresIn: '24h' as const,
+  algorithm: 'HS256' as const
+};
+
+// Cookie安全配置
+export const COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax' as const,
+  maxAge: 24 * 60 * 60, // 24小时
+  path: '/',
+  domain: process.env.NODE_ENV === 'production' ? undefined : 'localhost'
+};
+
 export interface AdminUser {
   id: number;
   username: string;
@@ -60,7 +76,7 @@ export async function login(credentials: LoginCredentials): Promise<{
       role: user.role
     };
 
-    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '24h' });
+    const token = jwt.sign(payload, JWT_SECRET, JWT_OPTIONS);
 
     // 更新最后登录时间
     db.prepare(`
@@ -84,42 +100,63 @@ export async function login(credentials: LoginCredentials): Promise<{
 }
 
 /**
- * 验证JWT令牌
+ * 验证JWT令牌（增强版）
  */
 export function verifyToken(token: string): JwtPayload | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as JwtPayload;
+    console.log('🔍 验证JWT令牌...');
+    const payload = jwt.verify(token, JWT_SECRET, { algorithms: ['HS256'] }) as JwtPayload;
+    console.log('✅ JWT令牌验证成功，用户:', payload.username);
+    return payload;
   } catch (error) {
-    console.error('Token verification error:', error);
+    console.error('❌ JWT令牌验证失败:', error instanceof Error ? error.message : '未知错误');
     return null;
   }
 }
 
 /**
- * 从请求头中获取JWT令牌
+ * 从Cookie中获取JWT令牌（新增）
  */
-export function getTokenFromHeaders(headers: Headers): string | null {
-  const authHeader = headers.get('authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+export function getTokenFromCookie(request: Request): string | null {
+  const cookieHeader = request.headers.get('cookie');
+  if (!cookieHeader) {
+    console.log('🔍 未找到Cookie头部');
     return null;
   }
-  return authHeader.substring(7);
+
+  const cookies = cookieHeader.split(';').reduce((acc, cookie) => {
+    const [name, value] = cookie.trim().split('=');
+    if (name && value) {
+      acc[name] = decodeURIComponent(value);
+    }
+    return acc;
+  }, {} as Record<string, string>);
+
+  const token = cookies['admin_token'] || null;
+  console.log('🔍 从Cookie中获取token:', !!token, token ? '长度:' + token.length : '无');
+  return token;
 }
 
 /**
- * 验证管理员权限的中间件函数
+ * 验证管理员权限的中间件函数（增强版，支持Cookie）
  */
-export function requireAuth(headers: Headers): JwtPayload | { error: string } {
-  const token = getTokenFromHeaders(headers);
+export function requireAuth(request: Request): JwtPayload | { error: string; debug?: string } {
+  console.log('🔐 开始管理员权限验证...');
+  
+  // 优先从Cookie获取token
+  const token = getTokenFromCookie(request);
   if (!token) {
-    return { error: '缺少认证令牌' };
+    console.log('❌ 未找到认证令牌');
+    return { error: '缺少认证令牌', debug: 'no_token_found' };
   }
 
   const payload = verifyToken(token);
   if (!payload) {
-    return { error: '无效的认证令牌' };
+    console.log('❌ 无效的认证令牌');
+    return { error: '无效的认证令牌', debug: 'invalid_token' };
   }
 
+  console.log('✅ 管理员权限验证成功，用户:', payload.username);
   return payload;
 }
 

@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useAuth } from './AuthProvider';
+import { useUnifiedAuth } from '@/lib/unified-auth';
+import { log } from '@/lib/unified-logger';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -12,7 +13,7 @@ interface AdminLayoutProps {
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const auth = useUnifiedAuth();
 
   const navigation = [
     { name: '仪表板', href: '/admin', icon: '📊' },
@@ -20,10 +21,29 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { name: '文章排序', href: '/admin/posts/order', icon: '📋' },
     { name: '访问统计', href: '/admin/analytics', icon: '📈' },
     { name: '标签管理', href: '/admin/tags', icon: '🏷️' },
+    { name: '认证诊断', href: '/admin/debug', icon: '🔍', adminOnly: true },
     { name: '设置', href: '/admin/settings', icon: '⚙️' },
   ];
 
-  if (!user) {
+  // 如果是登录页面，直接显示内容，不应用管理布局
+  if (pathname === '/admin/login' || pathname.startsWith('/admin/login/')) {
+    return <>{children}</>;
+  }
+
+  // 加载状态
+  if (auth.isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">加载中...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 未登录状态
+  if (!auth.isAuthenticated || !auth.user) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
@@ -57,9 +77,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <h1 className="ml-2 text-lg font-medium text-gray-900">管理后台</h1>
           </div>
           <div className="flex items-center">
-            <span className="text-sm text-gray-600 mr-3">{user.username}</span>
+            <span className="text-sm text-gray-600 mr-3">{auth.user.username}</span>
             <button
-              onClick={logout}
+              onClick={async () => {
+                log.info('auth', 'User logout from admin layout');
+                await auth.logout();
+              }}
               className="text-gray-500 hover:text-gray-600 focus:outline-none"
             >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -109,11 +132,14 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <div className="p-4 border-t border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-900">{user.username}</p>
-                  <p className="text-xs text-gray-500">{user.role}</p>
+                  <p className="text-sm font-medium text-gray-900">{auth.user.username}</p>
+                  <p className="text-xs text-gray-500">{auth.user.role}</p>
                 </div>
                 <button
-                  onClick={logout}
+                  onClick={async () => {
+                    log.info('auth', 'User logout from sidebar');
+                    await auth.logout();
+                  }}
                   className="text-gray-400 hover:text-gray-600 focus:outline-none"
                   title="退出登录"
                 >
@@ -135,9 +161,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 {navigation.find(item => item.href === pathname)?.name || '管理后台'}
               </h2>
               <div className="flex items-center space-x-4">
-                <span className="text-sm text-gray-600">欢迎, {user.username}</span>
+                <span className="text-sm text-gray-600">欢迎, {auth.user.username}</span>
                 <button
-                  onClick={logout}
+                  onClick={async () => {
+                    log.info('auth', 'User logout from header');
+                    await auth.logout();
+                  }}
                   className="text-gray-500 hover:text-gray-600 focus:outline-none"
                 >
                   退出登录

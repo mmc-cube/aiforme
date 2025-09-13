@@ -20,7 +20,7 @@ export interface PostData {
 export async function GET(request: NextRequest) {
   try {
     // 验证管理员权限
-    const auth = requireAuth(request.headers);
+    const auth = requireAuth(request);
     if ('error' in auth) {
       return NextResponse.json({ success: false, error: auth.error }, { status: 401 });
     }
@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // 验证管理员权限
-    const auth = requireAuth(request.headers);
+    const auth = requireAuth(request);
     if ('error' in auth) {
       return NextResponse.json({ success: false, error: auth.error }, { status: 401 });
     }
