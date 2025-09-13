@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useUnifiedAuth } from '@/lib/unified-auth';
+import { useAdminAuth } from '@/components/admin/AuthProvider';
 import { log } from '@/lib/unified-logger';
 
 interface AdminLayoutProps {
@@ -13,7 +13,7 @@ interface AdminLayoutProps {
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
-  const auth = useUnifiedAuth();
+  const auth = useAdminAuth();
 
   const navigation = [
     { name: '仪表板', href: '/admin', icon: '📊' },
@@ -31,7 +31,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   }
 
   // 加载状态
-  if (auth.isLoading) {
+  if (auth.loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
@@ -43,7 +43,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   }
 
   // 未登录状态
-  if (!auth.isAuthenticated || !auth.user) {
+  if (!auth.user) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
@@ -77,7 +77,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <h1 className="ml-2 text-lg font-medium text-gray-900">管理后台</h1>
           </div>
           <div className="flex items-center">
-            <span className="text-sm text-gray-600 mr-3">{auth.user.username}</span>
+            <span className="text-sm text-gray-600 mr-3">{auth.user?.username}</span>
             <button
               onClick={async () => {
                 log.info('auth', 'User logout from admin layout');
@@ -132,8 +132,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <div className="p-4 border-t border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-900">{auth.user.username}</p>
-                  <p className="text-xs text-gray-500">{auth.user.role}</p>
+                  <p className="text-sm font-medium text-gray-900">{auth.user?.username}</p>
+                  <p className="text-xs text-gray-500">{auth.user?.role}</p>
                 </div>
                 <button
                   onClick={async () => {
@@ -161,7 +161,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 {navigation.find(item => item.href === pathname)?.name || '管理后台'}
               </h2>
               <div className="flex items-center space-x-4">
-                <span className="text-sm text-gray-600">欢迎, {auth.user.username}</span>
+                <span className="text-sm text-gray-600">欢迎, {auth.user?.username}</span>
                 <button
                   onClick={async () => {
                     log.info('auth', 'User logout from header');

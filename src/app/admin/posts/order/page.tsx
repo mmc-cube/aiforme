@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { PostData } from '@/types/admin';
 import { PostOrder } from '@/components/admin/PostOrder';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { useAuth } from '@/components/admin/AuthProvider';
+import { useAdminAuth } from '@/components/admin/AuthProvider';
 
 export default function PostOrderPage() {
   const [posts, setPosts] = useState<PostData[]>([]);
@@ -13,7 +13,7 @@ export default function PostOrderPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAdminAuth();
 
   useEffect(() => {
     if (!authLoading && !user) {
