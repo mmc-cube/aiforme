@@ -1,4 +1,4 @@
-import AdminLayoutWrapper from '@/components/admin/AdminLayout';
+import AdminLayout from '@/components/admin/AdminLayout';
 import { AdminAuthProvider } from '@/components/admin/AuthProvider';
 
 export default function AdminLayout({
@@ -8,7 +8,7 @@ export default function AdminLayout({
 }) {
   return (
     <AdminAuthProvider>
-      <AdminLayoutWrapper>{children}</AdminLayoutWrapper>
+      <AdminLayout>{children}</AdminLayout>
     </AdminAuthProvider>
   );
 }
