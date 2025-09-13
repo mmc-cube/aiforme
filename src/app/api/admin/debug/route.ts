@@ -8,11 +8,7 @@ export async function GET(request: NextRequest) {
     const allCookies = request.cookies.getAll();
     console.log('🍪 [Debug] 所有Cookie:', allCookies.map(c => ({
       name: c.name,
-      value: c.value?.substring(0, 20) + '...',
-      domain: c.domain,
-      path: c.path,
-      httpOnly: c.httpOnly,
-      secure: c.secure
+      value: c.value?.substring(0, 20) + '...'
     })));
 
     // 获取特定的admin_token

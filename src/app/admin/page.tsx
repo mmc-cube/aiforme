@@ -12,7 +12,7 @@ interface DashboardStats {
   recentPosts: any[];
 }
 
-export default function AdminDashboard() {
+function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats>({
     totalPosts: 0,
     publishedPosts: 0,
