@@ -18,15 +18,23 @@ export async function GET(request: NextRequest) {
 
     if (!token) {
       console.log('❌ 认证验证失败：未找到Token');
+
+      // 详细的cookie调试信息
+      const allCookies = request.cookies.getAll();
+      const cookieHeader = request.headers.get('cookie');
+
       return NextResponse.json(
-        { 
-          success: false, 
-          error: '未登录', 
-          debug: 'no_token_in_cookies',
-          request_info: {
-            url: request.url,
-            method: request.method,
-            headers: Object.fromEntries(request.headers.entries())
+        {
+          success: false,
+          error: '未登录，请先登录',
+          debug: {
+            reason: 'no_token_in_cookies',
+            availableCookies: allCookies.map(c => ({ name: c.name, valueLength: c.value?.length || 0 })),
+            cookieHeader: cookieHeader?.substring(0, 200),
+            request: {
+              url: request.url,
+              method: request.method
+            }
           }
         },
         { status: 401 }

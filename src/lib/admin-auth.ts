@@ -17,7 +17,7 @@ export const COOKIE_OPTIONS = {
   sameSite: 'lax' as const,
   maxAge: 24 * 60 * 60, // 24小时
   path: '/',
-  domain: process.env.NODE_ENV === 'production' ? undefined : 'localhost'
+  domain: process.env.NODE_ENV === 'production' ? undefined : undefined
 };
 
 export interface AdminUser {
