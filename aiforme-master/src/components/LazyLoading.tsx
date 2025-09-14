@@ -91,10 +91,10 @@ export function CodeSplit({
 
     const loadComponent = async () => {
       try {
-        const moduleResult = await importFn();
+        const importedModule = await importFn();
         if (isMounted) {
           // 支持默认导出和命名导出
-          const componentToLoad = exportName === 'default' ? moduleResult.default : moduleResult[exportName];
+          const componentToLoad = exportName === 'default' ? importedModule.default : importedModule[exportName];
           if (componentToLoad) {
             setComponent(() => componentToLoad);
           } else {
