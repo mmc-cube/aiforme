@@ -24,7 +24,7 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-# SPA路由支持
+# Next.js 路由支持
 [[redirects]]
   from = "/*"
   to = "/index.html"

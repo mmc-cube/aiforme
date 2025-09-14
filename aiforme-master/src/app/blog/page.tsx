@@ -53,8 +53,38 @@ function BlogFooter() {
   );
 }
 
+interface PostMeta {
+  id: string;
+  title: string;
+  date: string;
+  excerpt?: string;
+  tags?: string[];
+  author?: string;
+}
+
 export default function BlogPage() {
   const { isAuthenticated, isLoading } = useAuth();
+  const [posts, setPosts] = useState<PostMeta[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // 在客户端获取文章数据
+    async function loadPosts() {
+      try {
+        const response = await fetch('/api/posts');
+        const postsData = await response.json();
+        setPosts(postsData);
+      } catch (error) {
+        console.error('Failed to load posts:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (isAuthenticated) {
+      loadPosts();
+    }
+  }, [isAuthenticated]);
 
   if (isLoading) {
     return (
@@ -98,7 +128,7 @@ export default function BlogPage() {
         </div>
 
         <LazyLoad>
-          <OptimizedPostList />
+          <OptimizedPostList posts={posts} />
         </LazyLoad>
       </main>
 

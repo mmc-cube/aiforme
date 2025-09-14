@@ -1,9 +1,11 @@
 import './globals.css'
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import { AuthProvider } from '@/components/AuthProvider'
 
-const inter = Inter({ subsets: ['latin'] })
+// 使用本地字体避免网络问题
+const inter = {
+  className: 'font-sans'
+}
 
 export const metadata: Metadata = {
   title: '知识分享博客 - 个人知识分享平台',

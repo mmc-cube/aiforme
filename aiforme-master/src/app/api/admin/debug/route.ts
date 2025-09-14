@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     console.log('🔍 [Debug] 开始认证调试...');
@@ -36,11 +38,7 @@ export async function GET(request: NextRequest) {
         cookies: {
           all: allCookies.map(c => ({
             name: c.name,
-            value: c.value?.substring(0, 20) + '...',
-            domain: c.domain,
-            path: c.path,
-            httpOnly: c.httpOnly,
-            secure: c.secure
+            value: c.value?.substring(0, 20) + '...'
           })),
           adminToken: {
             exists: !!adminToken,
